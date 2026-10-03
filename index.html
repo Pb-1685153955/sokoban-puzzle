@@ -6,323 +6,86 @@
 <title>宝藏迷宫 · 推箱子解谜</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --bg1: #1e1b4b;
-    --bg2: #312e81;
-    --wall: #4c1d95;
-    --wall-edge: #6d28d9;
-    --floor: #e0e7ff;
-    --target: #fbbf24;
-    --box: #f97316;
-    --box-on: #22c55e;
-    --player: #60a5fa;
-  }
-  html, body { height: 100%; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(135deg, var(--bg1), var(--bg2));
-    color: #f1f5f9;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
-    user-select: none;
-  }
-  h1 {
-    font-size: 26px;
-    margin: 8px 0 4px;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 10px rgba(0,0,0,.4);
-  }
-  .subtitle { font-size: 13px; opacity: .7; margin-bottom: 14px; }
-  .hud {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 12px;
-  }
-  .hud .stat {
-    background: rgba(255,255,255,.1);
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 14px;
-    backdrop-filter: blur(6px);
-  }
-  .hud .stat b { color: var(--target); }
-  .board-wrap {
-    background: rgba(0,0,0,.25);
-    padding: 14px;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.4);
-  }
-  #board {
-    display: grid;
-    gap: 3px;
-    width: min(92vw, 720px);
-  }
-  .cell {
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    min-height: clamp(38px, 7vh, 76px);
-  }
-  .cell.wall {
-    background: linear-gradient(145deg, var(--wall-edge), var(--wall));
-    box-shadow: inset 0 2px 4px rgba(255,255,255,.15), inset 0 -3px 6px rgba(0,0,0,.4);
-  }
-  .cell.floor { background: rgba(224,231,255,.12); }
-  .cell.target {
-    background: radial-gradient(circle, rgba(251,191,36,.35) 30%, rgba(224,231,255,.08) 75%);
-  }
-  .box {
-    width: 84%; height: 84%;
-    border-radius: 8px;
-    background: linear-gradient(145deg, #fb923c, var(--box));
-    box-shadow: 0 3px 6px rgba(0,0,0,.4), inset 0 2px 3px rgba(255,255,255,.4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: clamp(16px, 3vh, 26px);
-  }
-  .box.on {
-    background: linear-gradient(145deg, #4ade80, var(--box-on));
-    box-shadow: 0 0 14px rgba(34,197,94,.7), inset 0 2px 3px rgba(255,255,255,.4);
-  }
-  .player {
-    width: 70%; height: 70%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #93c5fd, var(--player));
-    box-shadow: 0 3px 8px rgba(0,0,0,.4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: clamp(16px, 3vh, 26px);
-  }
-  .controls {
-    margin-top: 14px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  button {
-    background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    padding: 9px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all .15s;
-  }
-  button:hover { background: rgba(255,255,255,.28); transform: translateY(-1px); }
-  button:active { transform: translateY(0); }
-  .dpad {
-    display: none;
-    margin-top: 14px;
-    grid-template-columns: repeat(3, 56px);
-    grid-template-rows: repeat(3, 56px);
-    gap: 6px;
-  }
-  .dpad button { font-size: 20px; padding: 0; }
-  .dpad .up { grid-area: 1/2; }
-  .dpad .left { grid-area: 2/1; }
-  .dpad .down { grid-area: 2/2; }
-  .dpad .right { grid-area: 2/3; }
-  @media (pointer: coarse) { .dpad { display: grid; } }
-  .win-banner {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-  }
-  .win-banner.show { display: flex; }
-  .win-card {
-    background: linear-gradient(135deg, #312e81, #4c1d95);
-    padding: 36px 48px;
-    border-radius: 18px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.6);
-    animation: pop .3s ease;
-  }
-  @keyframes pop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .win-card h2 { font-size: 28px; margin-bottom: 10px; color: var(--target); }
-  .win-card p { opacity: .85; margin-bottom: 18px; }
-  .hint { font-size: 12px; opacity: .55; margin-top: 10px; text-align: center; }
+  :root { --bg1:#1e1b4b; --bg2:#312e81; --wall:#4c1d95; --wall-edge:#6d28d9; --floor:#e0e7ff; --target:#fbbf24; --box:#f97316; --box-on:#22c55e; --player:#60a5fa; }
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;user-select:none}
+  h1{font-size:26px;margin:8px 0 4px;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+  .subtitle{font-size:13px;opacity:.7;margin-bottom:14px}
+  .hud{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+  .hud .stat{background:rgba(255,255,255,.1);padding:6px 14px;border-radius:10px;font-size:14px;backdrop-filter:blur(6px)}
+  .hud .stat b{color:var(--target)}
+  .board-wrap{background:rgba(0,0,0,.25);padding:14px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  #board{display:grid;gap:3px;width:min(92vw,720px)}
+  .cell{border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;min-height:clamp(38px,7vh,76px)}
+  .cell.wall{background:linear-gradient(145deg,var(--wall-edge),var(--wall));box-shadow:inset 0 2px 4px rgba(255,255,255,.15),inset 0 -3px 6px rgba(0,0,0,.4)}
+  .cell.floor{background:rgba(224,231,255,.12)}
+  .cell.target{background:radial-gradient(circle,rgba(251,191,36,.35) 30%,rgba(224,231,255,.08) 75%)}
+  .box{width:84%;height:84%;border-radius:8px;background:linear-gradient(145deg,#fb923c,var(--box));box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 2px 3px rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:clamp(16px,3vh,26px)}
+  .box.on{background:linear-gradient(145deg,#4ade80,var(--box-on));box-shadow:0 0 14px rgba(34,197,94,.7),inset 0 2px 3px rgba(255,255,255,.4)}
+  .player{width:70%;height:70%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#93c5fd,var(--player));box-shadow:0 3px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:clamp(16px,3vh,26px)}
+  .controls{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  button{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;padding:9px 18px;border-radius:10px;cursor:pointer;font-size:14px;transition:all .15s}
+  button:hover{background:rgba(255,255,255,.28);transform:translateY(-1px)}
+  .dpad{display:none;margin-top:14px;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:6px}
+  .dpad button{font-size:20px;padding:0}
+  .dpad .up{grid-area:1/2}.dpad .left{grid-area:2/1}.dpad .down{grid-area:2/2}.dpad .right{grid-area:2/3}
+  @media(pointer:coarse){.dpad{display:grid}}
+  .win-banner{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:10}
+  .win-banner.show{display:flex}
+  .win-card{background:linear-gradient(135deg,#312e81,#4c1d95;padding:36px 48px;border-radius:18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .3s ease}
+  @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  .win-card h2{font-size:28px;margin-bottom:10px;color:var(--target)}
+  .win-card p{opacity:.85;margin-bottom:18px}
+  .hint{font-size:12px;opacity:.55;margin-top:10px;text-align:center}
 </style>
 </head>
 <body>
-  <h1>宝藏迷宫</h1>
-  <div class="subtitle">把所有宝箱推到发光的宝藏点</div>
-
-  <div class="hud">
-    <div class="stat">关卡 <b id="lv">1</b>/<span id="lvTotal">6</span></div>
-    <div class="stat">步数 <b id="steps">0</b></div>
-    <div class="stat">推箱 <b id="pushes">0</b></div>
-  </div>
-
-  <div class="board-wrap"><div id="board"></div></div>
-
-  <div class="controls">
-    <button onclick="restart()">重开本关 (R)</button>
-    <button onclick="undo()">撤销 (Z)</button>
-    <button onclick="prevLevel()">上一关</button>
-    <button onclick="nextLevel()">下一关</button>
-  </div>
-
-  <div class="dpad">
-    <button class="up" onclick="move(0,-1)">↑</button>
-    <button class="left" onclick="move(-1,0)">←</button>
-    <button class="down" onclick="move(0,1)">↓</button>
-    <button class="right" onclick="move(1,0)">→</button>
-  </div>
-
-  <div class="hint">键盘方向键 / WASD 移动 · R 重开 · Z 撤销</div>
-
-  <div class="win-banner" id="winBanner">
-    <div class="win-card">
-      <h2 id="winTitle">🎉 过关！</h2>
-      <p id="winDesc">步数：0 · 推箱：0</p>
-      <button onclick="nextLevel()" style="font-size:16px;padding:12px 28px;">下一关 →</button>
-    </div>
-  </div>
-
+<h1>宝藏迷宫</h1>
+<div class="subtitle">把所有宝箱推到发光的宝藏点</div>
+<div class="hud"><div class="stat">关卡 <b id="lv">1</b>/<span id="lvTotal">20</span></div><div class="stat">步数 <b id="steps">0</b></div><div class="stat">推箱 <b id="pushes">0</b></div></div>
+<div class="board-wrap"><div id="board"></div></div>
+<div class="controls"><button onclick="restart()">重开本关 (R)</button><button onclick="undo()">撤销 (Z)</button><button onclick="prevLevel()">上一关</button><button onclick="nextLevel()">下一关</button></div>
+<div class="dpad"><button class="up" onclick="move(0,-1)">↑</button><button class="left" onclick="move(-1,0)">←</button><button class="down" onclick="move(0,1)">↓</button><button class="right" onclick="move(1,0)">→</button></div>
+<div class="hint">键盘方向键 / WASD 移动 · R 重开 · Z 撤销</div>
+<div class="win-banner" id="winBanner"><div class="win-card"><h2 id="winTitle">🎉 过关！</h2><p id="winDesc">步数：0 · 推箱：0</p><button onclick="nextLevel()" style="font-size:16px;padding:12px 28px">下一关 →</button></div></div>
 <script>
-const LEVELS = [
-  ["####","# .#","#  ###","#*@  #","#  $ #","#  ###","####"],
-  ["######","#@   #","# $$ #","# . .#","#    #","######"],
-  ["######","#. #@#","# $  #","#  $ #","# .  #","# ...#","######"],
-  [" #######"," #     #"," # .$. #","## $@$ ##","#  .$.  #","#   #   #","#########"],
-  ["#######","#@    #","# $ $ #","#  $  #","# . . #","#  .  #","#######"],
-  ["  #####","  #@  #","  # $$#"," ## #.#"," #  #.#"," #    #"," ######"]
+const LEVELS=[
+["####","# .#","#  ###","#*@  #","#  $ #","#  ###","####"],
+["######","#@   #","# $$ #","# . .#","#    #","######"],
+["######","#. #@#","# $  #","#  $ #","# .  #","# ...#","######"],
+[" #######"," #     #"," # .$. #","## $@$ ##","#  .$.  #","#   #   #","#########"],
+["#######","#@    #","# $ $ #","#  $  #","# . . #","#  .  #","#######"],
+["  #####","  #@  #","  # $$#"," ## #.#"," #  #.#"," #    #"," ######"],
+["#####","#.@ #","# $ #","# $ #","#.  #","#####"],
+["#######","#@    #","# $$  #","#  $  #","# . . #","#  .  #","#######"],
+["######","#@   #","# $$ #","#.  .#","#    #","######"],
+["########","#@      #","# $$$   #","# ...   #","#       #","########"],
+[" #######","#@      #","# $$$   #","# ...   #","#       #","#########"],
+["########","#  @    #","# $$$$  #","# ....  #","#       #","########"],
+["########","#@      #","# $$$   #","# ...   #","#       #","########"],
+["########","#@      #","# $$$$  #","# ....  #","#       #","########"],
+[" ######"," #@   #","# $$$ #","# ... #","#     #","######"],
+["#########","#@       #","# $$$$$  #","# .....  #","#        #","#########"],
+["########","#.  . .#","# $$ # #","# $@$  #","# $$ # #","#.  . .#","########"],
+["#########","#@       #","# $$$$   #","# ....   #","#        #","#########"],
+["#########","#@       #","# $$$$$$ #","# ..... .#","#        #","#########"],
+["##########","#@        #","# $$$$$   #","# .....   #","#         #","##########"]
 ];
-
-let level = 0;
-let walls = [], targets = [], boxes = [], player = {x:0,y:0};
-let steps = 0, pushes = 0;
-let history = [];
-
-const boardEl = document.getElementById('board');
-document.getElementById('lvTotal').textContent = LEVELS.length;
-
-function loadLevel(i) {
-  level = (i + LEVELS.length) % LEVELS.length;
-  const map = LEVELS[level];
-  walls = []; targets = []; boxes = [];
-  history = []; steps = 0; pushes = 0;
-  for (let y = 0; y < map.length; y++) {
-    walls[y] = [];
-    for (let x = 0; x < map[y].length; x++) {
-      const c = map[y][x];
-      walls[y][x] = c === '#';
-      if (c === '.' || c === '*' || c === '+') targets.push({x,y});
-      if (c === '$' || c === '*') boxes.push({x,y});
-      if (c === '@' || c === '+') player = {x,y};
-    }
-  }
-  document.getElementById('lv').textContent = level + 1;
-  render();
-}
-
-function isWall(x,y) { return !walls[y] || walls[y][x] === undefined || walls[y][x]; }
-function boxAt(x,y) { return boxes.findIndex(b => b.x===x && b.y===y); }
-function isTarget(x,y) { return targets.some(t => t.x===x && t.y===y); }
-
-function move(dx, dy) {
-  if (document.getElementById('winBanner').classList.contains('show')) return;
-  const nx = player.x + dx, ny = player.y + dy;
-  if (isWall(nx, ny)) return;
-  const bi = boxAt(nx, ny);
-  if (bi >= 0) {
-    const bx = nx + dx, by = ny + dy;
-    if (isWall(bx, by) || boxAt(bx, by) >= 0) return;
-    history.push({px:player.x, py:player.y, boxes: boxes.map(b=>({...b})), steps, pushes});
-    boxes[bi] = {x:bx, y:by};
-    pushes++;
-  } else {
-    history.push({px:player.x, py:player.y, boxes: boxes.map(b=>({...b})), steps, pushes});
-  }
-  player = {x:nx, y:ny};
-  steps++;
-  render();
-  checkWin();
-}
-
-function undo() {
-  if (!history.length) return;
-  const s = history.pop();
-  player = {x:s.px, y:s.py};
-  boxes = s.boxes;
-  steps = s.steps; pushes = s.pushes;
-  document.getElementById('winBanner').classList.remove('show');
-  render();
-}
-
-function restart() { loadLevel(level); }
-function prevLevel() { loadLevel(level - 1); }
-function nextLevel() {
-  document.getElementById('winBanner').classList.remove('show');
-  if (level + 1 >= LEVELS.length) {
-    document.getElementById('winTitle').textContent = '🏆 全部通关！';
-    document.getElementById('winDesc').textContent = '你是真正的宝藏猎人！';
-    document.getElementById('winBanner').classList.add('show');
-    return;
-  }
-  loadLevel(level + 1);
-}
-
-function checkWin() {
-  if (boxes.every(b => isTarget(b.x, b.y))) {
-    document.getElementById('winDesc').textContent = `步数：${steps} · 推箱：${pushes}`;
-    document.getElementById('winBanner').classList.add('show');
-  }
-}
-
-function render() {
-  const map = LEVELS[level];
-  const h = map.length, w = Math.max(...map.map(r=>r.length));
-  boardEl.style.gridTemplateColumns = `repeat(${w}, 1fr)`;
-  boardEl.style.gridTemplateRows = `repeat(${h}, 1fr)`;
-  boardEl.innerHTML = '';
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const cell = document.createElement('div');
-      if (isWall(x,y)) cell.className = 'cell wall';
-      else if (isTarget(x,y)) cell.className = 'cell target';
-      else cell.className = 'cell floor';
-      if (player.x===x && player.y===y) {
-        const p = document.createElement('div');
-        p.className = 'player';
-        p.textContent = '😊';
-        cell.appendChild(p);
-      }
-      const bi = boxAt(x,y);
-      if (bi >= 0) {
-        const b = document.createElement('div');
-        b.className = 'box' + (isTarget(x,y) ? ' on' : '');
-        b.textContent = isTarget(x,y) ? '💰' : '📦';
-        cell.appendChild(b);
-      }
-      boardEl.appendChild(cell);
-    }
-  }
-  document.getElementById('steps').textContent = steps;
-  document.getElementById('pushes').textContent = pushes;
-}
-
-document.addEventListener('keydown', e => {
-  const k = e.key.toLowerCase();
-  if (k==='arrowup' || k==='w') { e.preventDefault(); move(0,-1); }
-  else if (k==='arrowdown' || k==='s') { e.preventDefault(); move(0,1); }
-  else if (k==='arrowleft' || k==='a') { e.preventDefault(); move(-1,0); }
-  else if (k==='arrowright' || k==='d') { e.preventDefault(); move(1,0); }
-  else if (k==='r') restart();
-  else if (k==='z') undo();
-});
-
+let level=0,walls=[],targets=[],boxes=[],player={x:0,y:0},steps=0,pushes=0,history=[];
+const boardEl=document.getElementById('board');
+document.getElementById('lvTotal').textContent=LEVELS.length;
+function loadLevel(i){level=(i+LEVELS.length)%LEVELS.length;const map=LEVELS[level];walls=[];targets=[];boxes=[];history=[];steps=0;pushes=0;for(let y=0;y<map.length;y++){walls[y]=[];for(let x=0;x<map[y].length;x++){const c=map[y][x];walls[y][x]=c==='#';if(c==='.'||c==='*'||c==='+')targets.push({x,y});if(c==='$'||c==='*')boxes.push({x,y});if(c==='@'||c==='+')player={x,y}}}document.getElementById('lv').textContent=level+1;render()}
+function isWall(x,y){return !walls[y]||walls[y][x]===undefined||walls[y][x]}
+function boxAt(x,y){return boxes.findIndex(b=>b.x===x&&b.y===y)}
+function isTarget(x,y){return targets.some(t=>t.x===x&&t.y===y)}
+function move(dx,dy){if(document.getElementById('winBanner').classList.contains('show'))return;const nx=player.x+dx,ny=player.y+dy;if(isWall(nx,ny))return;const bi=boxAt(nx,ny);if(bi>=0){const bx=nx+dx,by=ny+dy;if(isWall(bx,by)||boxAt(bx,by)>=0)return;history.push({px:player.x,py:player.y,boxes:boxes.map(b=>({...b})),steps,pushes});boxes[bi]={x:bx,y:by};pushes++}else{history.push({px:player.x,py:player.y,boxes:boxes.map(b=>({...b})),steps,pushes})}player={x:nx,y:ny};steps++;render();checkWin()}
+function undo(){if(!history.length)return;const s=history.pop();player={x:s.px,y:s.py};boxes=s.boxes;steps=s.steps;pushes=s.pushes;document.getElementById('winBanner').classList.remove('show');render()}
+function restart(){loadLevel(level)}
+function prevLevel(){loadLevel(level-1)}
+function nextLevel(){document.getElementById('winBanner').classList.remove('show');if(level+1>=LEVELS.length){document.getElementById('winTitle').textContent='🏆 全部通关！';document.getElementById('winDesc').textContent='你是真正的宝藏猎人！';document.getElementById('winBanner').classList.add('show');return}loadLevel(level+1)}
+function checkWin(){if(boxes.every(b=>isTarget(b.x,b.y))){document.getElementById('winDesc').textContent=`步数：${steps} · 推箱：${pushes}`;document.getElementById('winBanner').classList.add('show')}}
+function render(){const map=LEVELS[level];const h=map.length,w=Math.max(...map.map(r=>r.length));boardEl.style.gridTemplateColumns=`repeat(${w},1fr)`;boardEl.style.gridTemplateRows=`repeat(${h},1fr)`;boardEl.innerHTML='';for(let y=0;y<h;y++){for(let x=0;x<w;x++){const cell=document.createElement('div');if(isWall(x,y))cell.className='cell wall';else if(isTarget(x,y))cell.className='cell target';else cell.className='cell floor';if(player.x===x&&player.y===y){const p=document.createElement('div');p.className='player';p.textContent='😊';cell.appendChild(p)}const bi=boxAt(x,y);if(bi>=0){const b=document.createElement('div');b.className='box'+(isTarget(x,y)?' on':'');b.textContent=isTarget(x,y)?'💰':'📦';cell.appendChild(b)}boardEl.appendChild(cell)}}document.getElementById('steps').textContent=steps;document.getElementById('pushes').textContent=pushes}
+document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k==='arrowup'||k==='w'){e.preventDefault();move(0,-1)}else if(k==='arrowdown'||k==='s'){e.preventDefault();move(0,1)}else if(k==='arrowleft'||k==='a'){e.preventDefault();move(-1,0)}else if(k==='arrowright'||k==='d'){e.preventDefault();move(1,0)}else if(k==='r')restart();else if(k==='z')undo()});
 loadLevel(0);
 </script>
 </body>
